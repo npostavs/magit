@@ -1352,7 +1352,11 @@ to, or to some other symbolic-ref that points to the same ref."
                 (magit-name-remote-branch (oref it value))))))
 
 (defun magit-commit-at-point ()
-  (or (magit-section-value-if 'commit)
+  (or (magit-section-case
+        (commit (oref it value))
+        (t (-when-let (child (car (oref it children)))
+             (when (eq (oref child type) 'commit)
+               (oref child value)))))
       (thing-at-point 'git-revision t)
       (when-let ((chunk (magit-current-blame-chunk 'addition t)))
         (oref chunk orig-rev))
@@ -1372,7 +1376,11 @@ to, or to some other symbolic-ref that points to the same ref."
                           (magit-branch-p
                            (forge--pullreq-branch (oref it value))))
                      (magit-ref-p (format "refs/pullreqs/%s"
-                                          (oref (oref it value) number))))))
+                                          (oref (oref it value) number)))))
+        (t (-when-let (child (car (and it (oref it children))))
+             (when (eq (oref child type) 'commit)
+               (let ((rev (oref child value)))
+                 (or (magit-get-shortname rev) rev))))))
       (thing-at-point 'git-revision t)
       (when-let ((chunk (magit-current-blame-chunk 'addition t)))
         (oref chunk orig-rev))
