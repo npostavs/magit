@@ -1215,7 +1215,11 @@ to, or to some other symbolic-ref that points to the same ref."
                 (magit-name-remote-branch (oref it value))))))
 
 (defun magit-commit-at-point ()
-  (or (magit-section-value-if 'commit)
+  (or (magit-section-case
+        (commit (oref it value))
+        (t (-when-let (child (car (oref it children)))
+             (when (eq (oref child type) 'commit)
+               (oref child value)))))
       (and (derived-mode-p 'magit-revision-mode)
            (car magit-refresh-args))))
 
@@ -1228,7 +1232,11 @@ to, or to some other symbolic-ref that points to the same ref."
                       (or (magit-name-branch rev)
                           (magit-get-shortname rev)
                           rev))))
-        (tag (magit-ref-maybe-qualify (oref it value) "tags/")))
+        (tag (magit-ref-maybe-qualify (oref it value) "tags/"))
+        (t (-when-let (child (car (and it (oref it children))))
+             (when (eq (oref child type) 'commit)
+               (let ((rev (oref child value)))
+                 (or (magit-get-shortname rev) rev))))))
       (thing-at-point 'git-revision t)
       (and (derived-mode-p 'magit-revision-mode
                            'magit-merge-preview-mode)
