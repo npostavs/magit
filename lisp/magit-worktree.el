@@ -111,6 +111,8 @@ then show it in Dired instead."
     map)
   "Keymap for `worktree' sections.")
 
+(magit-define-section-jumper magit-jump-to-worktrees "Worktrees" worktrees)
+
 (defun magit-insert-worktrees ()
   "Insert sections for all worktrees.
 If there is only one worktree, then insert nothing."

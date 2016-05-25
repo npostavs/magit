@@ -511,6 +511,8 @@ With a prefix argument, visit in another window."
        ((file-exists-p path)
         (dired-jump other-window (concat path "/.")))))))
 
+(magit-define-section-jumper magit-jump-to-submodules "Modules" modules)
+
 ;;;###autoload
 (defun magit-insert-modules-unpulled-from-upstream ()
   "Insert sections for modules that haven't been pulled from the upstream.
