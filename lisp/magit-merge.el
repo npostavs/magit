@@ -51,6 +51,7 @@
    [("m" "Merge"                  magit-merge-plain)
     ("e" "Merge and edit message" magit-merge-editmsg)
     ("n" "Merge but don't commit" magit-merge-nocommit)
+    ("o" "Octopus merge"          magit-merge-octopus :level 5)
     ("a" "Absorb"                 magit-merge-absorb)]
    [("p" "Preview merge"          magit-merge-preview)
     ?\n
@@ -91,6 +92,15 @@ merge.
                      current-prefix-arg))
   (magit-merge-assert)
   (magit-run-git-async "merge" (if nocommit "--no-commit" "--no-edit") args rev))
+
+(defun magit-merge-octopus (args &rest revs)
+  "Merge all given REVS into current branch."
+  (interactive (list (magit-merge-arguments)
+                     (completing-read-multiple
+                      "Merge (rev,s): " (magit-list-refnames)
+                      nil nil nil 'magit-revision-history
+                      (magit-branch-or-commit-at-point))))
+  (magit-merge-plain revs args))
 
 ;;;###autoload
 (defun magit-merge-editmsg (rev &optional args)
